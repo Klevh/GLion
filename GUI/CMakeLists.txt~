@@ -1,0 +1,38 @@
+# Nom du projet
+
+project(GUI)
+
+# creation executable
+
+add_library(
+  GUI
+  # add c files here (without main)
+)
+
+# linkage librairie externe
+
+target_link_libraries(
+  GUI
+  # toutes les dependances (glew, glfw, ...)
+  # chercher find package cmake
+)
+
+# adding include dir
+
+target_include_directories(
+  GUI
+  PUBLIC GUI/headers/
+)
+
+# definir l'exec
+
+add_executable(
+  GUI_sample
+  tests/main.c
+)
+
+target_link_libraries(
+  GUI_sample
+  GUI
+)
+
