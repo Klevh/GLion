@@ -1,14 +1,16 @@
 #include "ProgramsGLWrapper.h"
 
-struct ProgramGLWrapper{
-    struct ProgramGLWrapper * next;
-    GLuint                program;
-    unsigned              id;
-};
-
-ProgramGLWrapper * _programs_GLWrapper = NULL;
+List _programs_GLWrapper = NULL;
 
 
+ProgramGLWrapperList newProgramGLWrapperList(){
+    List pgl = newList();
+
+    if(!pgl)
+	_glwrapper_errors |= ERROR_MEMORY_ALLOC;
+
+    return pgl;
+}
 
 /* --------------- program compilation ----------------------------- */
 static int compile_shader_glion(GLuint * shader,char * shaderText,GLenum shaderType){
@@ -24,14 +26,18 @@ static int compile_shader_glion(GLuint * shader,char * shaderText,GLenum shaderT
     return !error;
 }
 
-GLION_ERROR newProgramGLWrapper(char * vertex,char * fragment,char * geometry){
-    GLION_ERROR     error = NO_ERROR;
-    ProgramGLWrapper *  new_prog = NULL;
-    ProgramGLWrapper ** tmp;
-    GLuint          vs;
-    GLuint          fs;
-    GLuint          gs;
-    int             err;
+unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragment,char * geometry){
+    GLION_ERROR error = NO_ERROR;
+    GLuint      vs;
+    GLuint      fs;
+    GLuint      gs;
+    int         err   = 1;
+    GLuint      id;
+    GLuint      tmp;
+    unsigned    i;
+
+    if(!pgl)
+	error = ERROR_NULL_PARAMETER;
 
     if(vertex)
         if(compile_shader_glion(&vs,vertex,GL_VERTEX_SHADER))
@@ -48,58 +54,62 @@ GLION_ERROR newProgramGLWrapper(char * vertex,char * fragment,char * geometry){
                     error = ERROR_GEOMETRY_COMPIL;
 
             if(!error){
-                new_prog = (ProgramGLWrapper*)malloc(sizeof(ProgramGLWrapper));
+		id = glCreateProgram();
 
-                if(new_prog){
-                    new_prog->program = glCreateProgram();
+		if(vertex)
+		    glAttachShader(id,vs);
 
-                    if(vertex)
-                        glAttachShader(new_prog->program,vs);
+		if(fragment)
+		    glAttachShader(id,fs);
 
-                    if(fragment)
-                        glAttachShader(new_prog->program,fs);
+		if(geometry)
+		    glAttachShader(id,gs);
 
-                    if(geometry)
-                        glAttachShader(new_prog->program,gs);
+		err = 0;
+		glLinkProgram(id);
+		glGetShaderiv(id,GL_LINK_STATUS, &err);
 
-                    glLinkProgram(new_prog->program);
-                    glGetShaderiv(new_prog->program,GL_LINK_STATUS, &err);
+		if(err){
+		    error = ERROR_PROGRAM_COMPIL;
+		    err   = 0;
+		}else{
+		    i = -1;
+		    initIteratorFrontList(pgl);
+		    do{
+			++i;
+			tmp = (GLuint)nextIteratorList(pgl, &err);
+		    }while(!err && tmp < id);
 
-                    if(err)
-                        error = ERROR_PROGRAM_COMPIL;
-                    else{
-                        new_prog->id = id;
-                        tmp = &_programs_GLWrapper;
-                        while(*tmp && (*tmp)->id > id)
-                            tmp = &((*tmp)->next);
-                        new_prog->next = *tmp;
-                        *tmp = new_prog;
-                    }
-                }else
-                    error = ERROR_MEMORY_ALLOC;
+		    if(pushList(pgl, (void*)id, i))
+			error = ERROR_MEMORY_ALLOC;
+
+		    err = 0;
+		}
 
                 if(geometry){
-                    if(!error)
-                        glDetachShader(new_prog->program,gs);
+                    if(!err)
+                        glDetachShader(id,gs);
                     glDeleteShader(gs);
                 }
             }
 
             if(fragment){
-                if(!error)
-                    glDetachShader(new_prog->program,fs);
+                if(!err)
+                    glDetachShader(id,fs);
                 glDeleteShader(fs);
             }
         }
 
         if(vertex){
-            if(!error)
-                glDetachShader(new_prog->program,vs);
+            if(!err)
+                glDetachShader(id,vs);
             glDeleteShader(vs);
         }
     }
 
-    return error;
+    _glwrapper_errors |= error;
+
+    return id;
 }
 /* ----------------------------------------------------------------- */
 
@@ -107,30 +117,8 @@ GLION_ERROR newProgramGLWrapper(char * vertex,char * fragment,char * geometry){
 
 
 /* ------------------- closing ProgramsGLWrapper ----------------------- */
-void closeProgramGLWrapper(){
-    ProgramGLWrapper * prog = _programs_GLWrapper;
-    ProgramGLWrapper * tmp;
-
-    while(prog){
-        tmp = prog->next;
-        glDeleteProgram(prog->program);
-        free(prog);
-        prog = tmp;
-    }
-}
-/* ----------------------------------------------------------------- */
-
-
-
-
-/* ------------------- Getter for Program GLuint ------------------- */
-GLuint getProgramGLWrapper(unsigned id){
-    ProgramGLWrapper * current = _programs_GLWrapper;
-
-    while(current && current->id < id)
-        current = current->next;
-
-    return (current && current->id == id ? current->program : 0);
+void closeProgramGLWrapper(ProgramGLWrapperList pgl){
+    deleteList(pgl);
 }
 /* ----------------------------------------------------------------- */
 

@@ -15,6 +15,8 @@ add_library(
   sources/ProgramsGLWrapper.c
   sources/List.c
   sources/Iterator.c
+  sources/PatternGLWrapper.c
+  sources/InstanceGLWrapper.c
 )
 
 # trouver les packages

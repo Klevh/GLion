@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include "ErrorGLWrapper.h"
+#include "List.h"
 
 /**
    @file ProgramsGLWrapper.h
@@ -11,32 +12,32 @@
  */
 
 /**
-   @struct ProgramGLWrapper
-   @brief Contains all informations about a GLWrapper program
+ * @brief List of usable program openGL
  */
-typedef struct ProgramGLWrapper ProgramGLWrapper;
+typedef List ProgramGLWrapperList;
 
-extern ProgramGLWrapper * _programs_GLWrapper;
-/**< lists of GLWrapper programs (default and user defined), do not use this variable directly */
+extern GLWRAPPER_ERROR _glwrapper_errors;
+/**< unread errors code */
 
 /**
-   @brief Add a new program to the list
-   @param vertex : string representing the vertex shader
-   @param fragment : string representing the fragment shader
-   @param geometry : string representing the geometry shader
-   @param id : index of the program to access it if it was correctly created
-   @return error code (see GLION_ERROR)
+ * @brief create a new list of opengl program
+ * @return the list created
  */
-GLION_ERROR newProgramGLWrapper(char * vertex,char * fragment,char * geometry, unsigned id);
+ProgramGLWrapperList newProgramGLWrapperList();
+
 /**
- * @brief Free the space allocated for every program added
+ * @brief Add a new program to a list of program
+ * @param pgl : program list to be modified
+ * @param vertex : string representing the vertex shader
+ * @param fragment : string representing the fragment shader
+ * @param geometry : string representing the geometry shader
+ * @return index of the program to access it if it was correctly created
  */
-void closeProgramGLWrapper();
+unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragment,char * geometry);
 /**
-   @brief Getter for the program GLuint (to use with OpenGL functions)
-   @param id : id of the program to get the GLuint from
-   @return 0 if the program was not find, the GLuint of the program if it was find
+ * @brief Free the space allocated for every program added in a list
+ * @param pgl : list to be closed
  */
-GLuint getProgramGLWrapper(unsigned id);
+void closeProgramGLWrapper(ProgramGLWrapperList pgl);
 
 #endif
