@@ -1,2 +1,0 @@
-/usr/bin/ar qc libGLWrapper.a  CMakeFiles/GLWrapper.dir/sources/GLWrapper.c.o CMakeFiles/GLWrapper.dir/sources/ErrorGLWrapper.c.o CMakeFiles/GLWrapper.dir/sources/InputGLWrapper.c.o CMakeFiles/GLWrapper.dir/sources/ProgramsGLWrapper.c.o CMakeFiles/GLWrapper.dir/sources/List.c.o CMakeFiles/GLWrapper.dir/sources/Iterator.c.o CMakeFiles/GLWrapper.dir/sources/PatternGLWrapper.c.o CMakeFiles/GLWrapper.dir/sources/InstanceGLWrapper.c.o
-/usr/bin/ranlib libGLWrapper.a
