@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/ErrorGLWrapper.c
+ErrorGlion.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/ErrorGlion.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/GLWrapper.c
+GLWrapper.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/GLWrapper.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/InputGLWrapper.c
+InputGLWrapper.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/InputGLWrapper.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/InstanceGLWrapper.c
+InstanceGLWrapper.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/InstanceGLWrapper.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/Iterator.c
+Iterator.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/Iterator.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/List.c
+List.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/List.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/PatternGLWrapper.c
+PatternGLWrapper.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/PatternGLWrapper.h
+
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/ProgramsGLWrapper.c
+ProgramsGLWrapper.h
+/home/baptiste/Programmation/C/Librairies/GLion/GLWrapper/sources/ProgramsGLWrapper.h
+

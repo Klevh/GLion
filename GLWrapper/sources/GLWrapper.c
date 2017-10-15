@@ -1,6 +1,6 @@
 #include "GLWrapper.h"
 
-void initGL(){
+void initGLWrapper(){
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -41,4 +41,8 @@ void drawListGLPattern(ListGLPattern * lgp){
 				    glp->nb_instances);
 	}
     }
+}
+
+void setBackgroundColorGLWrapper(float r, float g, float b, float a){
+    glClearColor(r,g,b,a);
 }

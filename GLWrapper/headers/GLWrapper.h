@@ -1,6 +1,8 @@
 #ifndef _MAIN_GLWRAPPER_KLEVH_
 #define _MAIN_GLWRAPPER_KLEVH_
 
+// TODO : gestion des uniforms
+
 /**
  * @file GLWrapper.h
  * @author Baptiste PRUNIER (KLEVH)
@@ -16,9 +18,9 @@
 #include "InputGLWrapper.h"
 
 /**
- * @brief Initialize OpenGL, Glew and GLFW
+ * @brief Initialize GLWrapper
  */
-void initGL(void);
+void initGLWrapper(void);
 
 /**
  * @brief Draw all instances of all patterns in a list of GLPattern
@@ -26,6 +28,13 @@ void initGL(void);
  */
 void drawListGLPattern(ListGLPattern * lgp);
 
-// TODO : function to set clearing color
+/**
+ * @brief Setter for the background color
+ * @param r : new red value
+ * @param g : new green value
+ * @param b : new blue value
+ * @param a : new alpha value
+ */
+void setBackgroundColorGLWrapper(float r, float g, float b, float a);
 
 #endif
