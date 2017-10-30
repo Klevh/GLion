@@ -1,43 +1,59 @@
 #include "PatternGLWrapper.h"
 
 static void gl_buffer_data(GLPattern * glp){
+    char s[512];
     size_t i;
     
     glBindVertexArray(glp->VAO);
+    writeLogsGLWrapper("addGLPattern - glBindVertexArray");
     
     // 3D point
     glBindBuffer(GL_ARRAY_BUFFER, glp->VBO[0]);
+    writeLogsGLWrapper("addGLPattern - glBindBuffer - first buffer");
     glBufferData(GL_ARRAY_BUFFER,
 		 glp->v_size * sizeof(GLfloat),
 		 glp->vertices,
 		 GL_STATIC_DRAW);
+    writeLogsGLWrapper("addGLPattern - glBufferData - first buffer");
     glVertexAttribPointer(0,
 			  3,
 			  GL_FLOAT,
 			  GL_FALSE,
 			  3*sizeof(GLfloat),
 			  (GLvoid*)0);
+    writeLogsGLWrapper("addGLPattern - glVertexAttribPointer - 0");
     glEnableVertexAttribArray(0);
+    writeLogsGLWrapper("addGLPattern - glEnableVertexAttribArray - 0");
     glVertexAttribDivisor(0, 0);
+    writeLogsGLWrapper("addGLPattern - glVertexAttribDivisor - 0");
 
     // other attributes
     glBindBuffer(GL_ARRAY_BUFFER, glp->VBO[1]);
+    writeLogsGLWrapper("addGLPattern - glBindBuffer - second buffer");
     glBufferData(GL_ARRAY_BUFFER,
 		 glp->infos.iv_size * glp->size * 3 * glp->nb_instances_max * sizeof(GLfloat),
 		 glp->infos.infos_values,
 		 GL_STATIC_DRAW);
+    writeLogsGLWrapper("addGLPattern - glBufferData - second buffer");
     for(i = 0; i < glp->infos.sbi_size; ++i){
 	glVertexAttribPointer(i + 1,
-			      glp->infos.start_infos[i],
+			      glp->infos.sizes_by_info[i],
 			      GL_FLOAT,
 			      GL_FALSE,
 			      glp->infos.iv_size * sizeof(GLfloat),
 			      (GLvoid*)(sizeof(*(glp->infos.infos_values)) * glp->infos.start_infos[i]));
+	sprintf(s,"addGLPattern - glVertexAttribPointer - %lu",i + 1);
+	writeLogsGLWrapper(s);
 	glEnableVertexAttribArray(i + 1);
+	sprintf(s,"addGLPattern - glEnableVertexAttribArray - %lu",i + 1);
+	writeLogsGLWrapper(s);
 	glVertexAttribDivisor(i + 1, 1);
+	sprintf(s,"addGLPattern - glVertexAttribDivisor - %lu",i + 1);
+	writeLogsGLWrapper(s);
     }
 
     glBindVertexArray(0);
+    writeLogsGLWrapper("addGLPattern - unbinding VAO");
 }
 
 void free_glpattern(void * _glp){
@@ -120,13 +136,16 @@ unsigned addGLPattern(ListGLPattern lgp, float * vertices,unsigned v_size,unsign
 				glp->program          = id_program;
 				glp->nb_instances_max = max_instance_nb;
 			
+				writeLogsGLWrapper("Before addGLPattern");
 				glGenVertexArrays(1,&(glp->VAO));
+				writeLogsGLWrapper("addGLPattern - glGenVertexArrays");
 				glGenBuffers(2,glp->VBO);
+				writeLogsGLWrapper("addGLPattern - glGenBuffers");
 				gl_buffer_data(glp);
 	
 				if(pushBackList(lgp,glp)){
 				    free_glpattern(glp);
-				    _glwrapper_errors |= ERROR_MEMORY_ALLOC;
+				    _glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 				}else{
 				    id      = lenList(lgp);
 				    glp->id = id;
@@ -138,7 +157,7 @@ unsigned addGLPattern(ListGLPattern lgp, float * vertices,unsigned v_size,unsign
 				free(glp->infos.start_infos);
 				free(glp->infos.sizes_by_info);
 				free(glp);
-				_glwrapper_errors |= ERROR_MEMORY_ALLOC;
+				_glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 			    }
 			}else{ // glp->vertices
 			    deleteList(glp->instances);
@@ -146,37 +165,39 @@ unsigned addGLPattern(ListGLPattern lgp, float * vertices,unsigned v_size,unsign
 			    free(glp->infos.start_infos);
 			    free(glp->infos.sizes_by_info);
 			    free(glp);
-			    _glwrapper_errors |= ERROR_MEMORY_ALLOC;
+			    _glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 			}
 		    }else{ // glp->infos.infos_values
 			deleteList(glp->instances);
 			free(glp->infos.start_infos);
 			free(glp->infos.sizes_by_info);
 			free(glp);
-			_glwrapper_errors |= ERROR_MEMORY_ALLOC;
+			_glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 		    }
 		}else{ // glp->infos.start_infos
 		    deleteList(glp->instances);
 		    free(glp->infos.sizes_by_info);
 		    free(glp);
-		    _glwrapper_errors |= ERROR_MEMORY_ALLOC;
+		    _glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 		}
 	    }else{ // glp->infos.sizes_by_info
 		deleteList(glp->instances);
 		free(glp);
-		_glwrapper_errors |= ERROR_MEMORY_ALLOC;
+		_glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 	    }
 	}else{
 	    free(glp);
-	    _glwrapper_errors |= ERROR_MEMORY_ALLOC;
+	    _glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
 	}
     }else{ // glp && vertice
 	if(glp){
-	    _glwrapper_errors |= ERROR_BAD_PARAM;
+	    _glwrapper_logs.error |= ERROR_BAD_PARAM;
 	    free(glp);
 	}else
-	    _glwrapper_errors |= ERROR_MEMORY_ALLOC;
+	    _glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
     }
+
+    writeLogsGLWrapper("addGLPattern");
     
     return id;
 }

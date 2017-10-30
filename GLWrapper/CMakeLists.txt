@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
+# c version
+set(CMAKE_C_STANDARD 90)
+
 # Nom du projet
 
 project(GLWrapper)
@@ -49,7 +52,12 @@ target_link_libraries(
 target_include_directories(
   GLWrapper
   PUBLIC headers/
-)
+  )
+
+# options de compilations
+
+add_compile_options("-ansi"
+  "-g")
 
 # definir l'exec
 

@@ -8,6 +8,7 @@ int initGLWrapper(){
     }
 
     glEnable(GL_DEPTH_TEST);
+    glGetError();
     return 0;
 }
 
@@ -32,5 +33,6 @@ void drawListGLPattern(ListGLPattern * lgp){
 				    glp->index,
 				    glp->nb_instances);
 	}
+	writeLogsGLWrapper("drawListGLPattern");
     }
 }

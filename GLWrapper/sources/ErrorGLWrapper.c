@@ -1,56 +1,52 @@
 #include "ErrorGLWrapper.h"
 
-GLWRAPPER_ERROR _glwrapper_errors = NO_ERROR;
+GLWRAPPER_LOG _glwrapper_logs = {NO_ERROR,GL_NO_ERROR,0};
 
-GLWRAPPER_ERROR getErrGLWrapper(){
-    GLWRAPPER_ERROR error = _glwrapper_errors;
-
-    _glwrapper_errors = NO_ERROR;
-    
-    return error;
+GLWRAPPER_ERROR getLastCallErrorGLWrapper(void){
+    return _glwrapper_logs.last_error;
 }
 
-char * getErrMsgGLWrapper(GLWRAPPER_ERROR error){
-    static char     * messages[]
-	= {"ERROR :: Vertex shader compilation failed\n",
-	   "ERROR :: Fragment shader compilation failed\n",
-	   "ERROR :: Geometry shader compilation failed\n",
-	   "ERROR :: Program shader compilation failed\n",
-	   "ERROR :: Memory allocation failed\n",
-	   "ERROR :: Unknown error happened\n",
-	   "ERROR :: To many element, couldn't add a new one\n",
-	   "ERROR :: Null parameter when none-null needed\n",
-	   "ERROR :: A parameter do not have the correct format\n",
-	   "ERROR :: A parameter does not have the correct value\n"
-    };
-    static unsigned   sizes[]     = {42,44,44,43,34,32,49,46,52,53};
-    unsigned          size        = 0;
-    char            * s           = NULL;
-    unsigned          id          = 1;
-    unsigned          i           = 0;
+void setLogOutputGLWrapper(FILE * log){
+    _glwrapper_logs.log_file = log;
+}
 
-    while(id < error){
-	if(error&id)
-	    size += sizes[i];
-	++i;
-	id <<= 1;
+void writeLogsGLWrapper(char * function){
+    static char     * messages[]
+	= {"\t\tERROR :: Vertex shader compilation failed\n",
+	   "\t\tERROR :: Fragment shader compilation failed\n",
+	   "\t\tERROR :: Geometry shader compilation failed\n",
+	   "\t\tERROR :: Program shader compilation failed\n",
+	   "\t\tERROR :: Memory allocation failed\n",
+	   "\t\tERROR :: Unknown error happened\n",
+	   "\t\tERROR :: To many element, couldn't add a new one\n",
+	   "\t\tERROR :: Null parameter when none-null needed\n",
+	   "\t\tERROR :: A parameter do not have the correct format\n",
+	   "\t\tERROR :: A parameter does not have the correct value\n"
+    };
+    unsigned bit      = 1;
+    unsigned i        = 0;
+    GLenum   gl_error = glGetError();
+
+    if(_glwrapper_logs.log_file && (gl_error || _glwrapper_logs.error)){
+	fprintf(_glwrapper_logs.log_file,"Errors in function %s\n",function);
+	if(_glwrapper_logs.error){
+	    fprintf(_glwrapper_logs.log_file, "\tGLWrapper errors :\n");
+	    while(bit <= _glwrapper_logs.error){
+		if(_glwrapper_logs.error & bit)
+		    fprintf(_glwrapper_logs.log_file,"%s",messages[i]);
+		++i;
+		bit <<= 1;
+	    }
+	}
+	if(gl_error){
+	    fprintf(_glwrapper_logs.log_file, "\tOpenGL errors :\n");
+	    do{
+		fprintf(_glwrapper_logs.log_file, "\t\t%s\n", gluErrorString(gl_error));
+		gl_error = glGetError();
+	    }while(gl_error);
+	}
     }
 
-    id = 1;
-    i  = 0;
-    s  = malloc((size + 1)*sizeof(*s));
-
-    if(s){
-	s[0] = 0;
-
-	while(id < error){
-	    if(error & id)
-		strcat(s,messages[i]);
-	    ++i;
-	    id <<= 1;
-	}
-    }else
-	_glwrapper_errors |= ERROR_MEMORY_ALLOC;
-
-    return s;
+    _glwrapper_logs.last_error = _glwrapper_logs.error;
+    _glwrapper_logs.error      = NO_ERROR;
 }

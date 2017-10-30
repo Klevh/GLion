@@ -14,9 +14,11 @@ GLInstance * addGLInstance(ListGLPattern lgp, unsigned pattern){
 	    gli->pattern       = glp;
 	    ++glp->nb_instances;
 	}else
-	    _glwrapper_errors |= ERROR_MEMORY_ALLOC;
+	    _glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
     }else
-	_glwrapper_errors |= ERROR_BAD_PARAM;
+	_glwrapper_logs.error |= ERROR_BAD_PARAM;
+
+    writeLogsGLWrapper("addGLInstance");
 
     return gli;
 }
@@ -39,6 +41,8 @@ void delGLInstance(GLInstance * gli){
 
 	free(gli);
     }
+
+    writeLogsGLWrapper("delGLInstance");
 }
 
 int setDataGLInstance(GLInstance * gli, unsigned id_of_data, unsigned id_vertice, ...){

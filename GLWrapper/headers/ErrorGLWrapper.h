@@ -4,12 +4,13 @@
 /**
    @file ErrorGLWrapper.h
    @author Baptiste PRUNIER
-   @brief Contains all functions, structures and global variables directly related to the error manager of GLWrapper
+   @brief Contains all functions, structures and global variables directly related to the error manager of GLWrapper. When a message is displayed, it means that it comes from the function indicated in the message in MOST case (it can comes from a function before).
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <GL/glew.h>
 
 typedef enum{
     NO_ERROR              = 0,
@@ -25,18 +26,27 @@ typedef enum{
     ERROR_BAD_PARAM       = 512
 }GLWRAPPER_ERROR;
 
-extern GLWRAPPER_ERROR _glwrapper_errors;
+typedef struct{
+    GLWRAPPER_ERROR error;
+    GLWRAPPER_ERROR last_error;
+    FILE * log_file;
+}GLWRAPPER_LOG;
+
+extern GLWRAPPER_LOG _glwrapper_logs;
 
 /**
- *@brief Getter for the global variable, set it to NO_ERROR after reading
- *@return the error code
+ * @brief Get the glwrapper error code of the last function call
+ * @return The glwrapper code of the last function call
  */
-GLWRAPPER_ERROR getErrGLWrapper();
+GLWRAPPER_ERROR getLastCallErrorGLWrapper(void);
 
 /**
- *@brief Getter for the error message corresponding to the error code passed as a parameter
- *@param error : error to be analyzed
- *@return the string corresponding to the error used as a parameter (empty string if no error, NULL if memory allocation failed)
+ * @brief Set the file where the log should be written (by default, it is stdout
+ * @param log : file to be written in
  */
-char * getErrMsgGLWrapper(GLWRAPPER_ERROR error);
+void setLogOutputGLWrapper(FILE * log);
+
+/* functions not to be used by user */
+void writeLogsGLWrapper(char * function);
+
 #endif

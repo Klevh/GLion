@@ -7,11 +7,12 @@ ProgramGLWrapperList newProgramGLWrapperList(){
     List pgl = newList();
 
     if(!pgl)
-	_glwrapper_errors |= ERROR_MEMORY_ALLOC;
+	_glwrapper_logs.error |= ERROR_MEMORY_ALLOC;
+
+    writeLogsGLWrapper("newProgramGLWrapperList");
 
     return pgl;
 }
-
 /* --------------- program compilation ----------------------------- */
 static int compile_shader_glwrapper(GLuint * shader,char * shaderText,GLenum shaderType){
     int error = 0;
@@ -31,7 +32,7 @@ unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragm
     GLuint      vs;
     GLuint      fs;
     GLuint      gs;
-    int         err   = 1;
+    int         err       = 1;
     GLuint      id;
     GLuint      tmp;
     unsigned    i;
@@ -67,11 +68,10 @@ unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragm
 
 		err = 0;
 		glLinkProgram(id);
-		glGetShaderiv(id,GL_LINK_STATUS, &err);
+		glGetProgramiv(id,GL_LINK_STATUS, &err);
 
-		if(err){
+		if(!err){
 		    error = ERROR_PROGRAM_COMPIL;
-		    err   = 0;
 		}else{
 		    i = -1;
 		    initIteratorFrontList(pgl);
@@ -107,7 +107,9 @@ unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragm
         }
     }
 
-    _glwrapper_errors |= error;
+    _glwrapper_logs.error |= error;
+
+    writeLogsGLWrapper("newProgramGLWrapper");
 
     return id;
 }

@@ -5,8 +5,6 @@
 #define WIDTH 400
 #define HEIGHT 400
 
-int errorManagment(char * s);
-
 int main(){
     ProgramGLWrapperList   programs;
     ListGLPattern          lgp;
@@ -25,6 +23,8 @@ int main(){
     int                    err;
     GLPattern            * glp;
 
+    /* setting the log output to stdout */
+    setLogOutputGLWrapper(stdout);
     
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -58,14 +58,14 @@ int main(){
 
     /* creating the list of programs */
     programs = newProgramGLWrapperList();
-    if(errorManagment("newProgramGLWrapperList")){
+    if(getLastCallErrorGLWrapper()){
 	glfwTerminate();
 	return -1;
     }
 
     /* creating a program shader */
     prog = newProgramGLWrapper(programs,ofread_str("ressources/vertex.glsl"),ofread_str("ressources/fragment.glsl"),NULL);
-    if(errorManagment("newProgramGLWrapper")){
+    if(getLastCallErrorGLWrapper()){
 	closeProgramGLWrapper(programs);
 	glfwTerminate();
 	return -1;
@@ -73,7 +73,7 @@ int main(){
 
     /* creating a list of pattern */
     lgp = newListGLPattern();
-    if(errorManagment("newListGLPattern")){
+    if(getLastCallErrorGLWrapper()){
 	closeProgramGLWrapper(programs);
 	glfwTerminate();
 	return -1;
@@ -84,7 +84,7 @@ int main(){
 			   3, /* color RGB */
 			   2, /* offset XY */
 	                   2); /* ratio XY*/
-    if(errorManagment("addGLPattern")){
+    if(getLastCallErrorGLWrapper()){
 	deleteListGLPattern(lgp);
 	closeProgramGLWrapper(programs);
 	glfwTerminate();
@@ -99,7 +99,7 @@ int main(){
 	while(!err && j < 1){
 	    printf("Generating instance %d\n",i*10 + j + 1);
 	    gli = addGLInstance(lgp, pattern);
-	    err = errorManagment("addGLInstance");
+	    err = getLastCallErrorGLWrapper();
 
 	    if(!err){
 		for(j = 0; j < 6; ++j){
@@ -173,23 +173,4 @@ int main(){
     glfwTerminate();
     
     return 0;
-}
-
-int errorManagment(char * s){
-    GLWRAPPER_ERROR   error;
-    char            * log;
-    
-    if((error = getErrGLWrapper())){
-	printf("log value : %d\n",error);
-	log = getErrMsgGLWrapper(error);
-	if(log){
-	    if(s)
-		fprintf(stderr,"%s :\n",s);
-	    fprintf(stderr,"%s\n",log);
-	    free(log);
-	}else
-	    fprintf(stderr,"Failed to load error log message\n");
-    }
-
-    return error != NO_ERROR;
 }
