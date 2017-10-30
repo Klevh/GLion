@@ -2,6 +2,7 @@
 #define _INPUT_GLWRAPPER_KLEVH_
 
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
    @file InputGLWrapper.h

@@ -43,18 +43,20 @@ void delGLInstance(GLInstance * gli);
  * @brief setter for a GLInstance's data
  * @param gli : GLInstance to be modified
  * @param id_of_data : identifier of the data to be modified (location - 1, see addGLPattern)
+ * @param id_vertice : identifier of the vertice to modify the data on
  * @param ... : all values of the data to be changed
  * @return 1 if it failed, 0 if not
  */
-int setDataGLInstance(GLInstance * gli, unsigned id_of_data, ...);
+int setDataGLInstance(GLInstance * gli, unsigned id_of_data, unsigned id_vertice, ...);
 
 /**
  * @brief setter for a GLInstance's data
  * @param gli : GLInstance to be modified
  * @param id_of_data : identifier of the data to be "returned" (location - 1, see addGLPattern)
+ * @param id_vertice : identifier of the vertice to get the data from
  * @param ... : where to store all values of the data
  * @return 1 if it failed, 0 if not
  */
-int getDataGLInstance(GLInstance *gli, unsigned id_of_data, ...);
+int getDataGLInstance(GLInstance *gli, unsigned id_of_data, unsigned id_vertice, ...);
 
 #endif

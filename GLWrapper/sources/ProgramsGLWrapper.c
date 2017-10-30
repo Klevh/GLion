@@ -13,7 +13,7 @@ ProgramGLWrapperList newProgramGLWrapperList(){
 }
 
 /* --------------- program compilation ----------------------------- */
-static int compile_shader_glion(GLuint * shader,char * shaderText,GLenum shaderType){
+static int compile_shader_glwrapper(GLuint * shader,char * shaderText,GLenum shaderType){
     int error = 0;
 
     if(shader && shaderText){
@@ -27,7 +27,7 @@ static int compile_shader_glion(GLuint * shader,char * shaderText,GLenum shaderT
 }
 
 unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragment,char * geometry){
-    GLION_ERROR error = NO_ERROR;
+    GLWRAPPER_ERROR error = NO_ERROR;
     GLuint      vs;
     GLuint      fs;
     GLuint      gs;
@@ -40,17 +40,17 @@ unsigned newProgramGLWrapper(ProgramGLWrapperList pgl,char * vertex,char * fragm
 	error = ERROR_NULL_PARAMETER;
 
     if(vertex)
-        if(compile_shader_glion(&vs,vertex,GL_VERTEX_SHADER))
+        if(compile_shader_glwrapper(&vs,vertex,GL_VERTEX_SHADER))
             error = ERROR_VERTEX_COMPIL;
 
     if(!error){
         if(fragment)
-            if(compile_shader_glion(&fs,fragment,GL_FRAGMENT_SHADER))
+            if(compile_shader_glwrapper(&fs,fragment,GL_FRAGMENT_SHADER))
                 error = ERROR_FRAGMENT_COMPIL;
 
         if(!error){
             if(geometry)
-                if(compile_shader_glion(&gs,geometry,GL_GEMETRY_SHADER))
+                if(compile_shader_glwrapper(&gs,geometry,GL_GEOMETRY_SHADER))
                     error = ERROR_GEOMETRY_COMPIL;
 
             if(!error){

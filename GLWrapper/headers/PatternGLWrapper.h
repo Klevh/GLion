@@ -21,7 +21,7 @@
  */
 typedef struct{
     GLfloat  * infos_values;
-    /**< values of all informations (of size iv_size * ::size / 3 * ::nb_instances_max */
+    /**< values of all informations (of size iv_size * ::size * 3 * ::nb_instances_max */
     size_t     iv_size;
     /**< size of one set of attributes in infos_values */
     unsigned * sizes_by_info;
@@ -38,9 +38,13 @@ typedef struct{
  */
 typedef struct{
     GLfloat          * vertices;
-    /**< vertices of the pattern */
+    /**< vertices of the pattern (three per triangles) */
+    unsigned           v_size;
+    /**< size of vertices */
+    unsigned short   * index;
+    /**< indexes in vertices of each point in each triangle (three index per triangle) */
     unsigned           size;
-    /**< number of vertices */
+    /**< number triangles */
     GLDataInfo         infos;
     /**< all infos of the pattern (dependant of the program) */
     GLuint             VAO;
@@ -82,14 +86,19 @@ void deleteListGLPattern(ListGLPattern lgp);
 /**
  * @brief add a pattern to a list of pattern (can set a GLWRAPPER_ERROR)
  * @param lgp : ListGLPattern to be modified
- * @param vertices : list of dots representing a list of triange (3D dots)
- * @param size : size of the array
+ * @param vertices : list of dots you want to use to draw your rectangles
+ * @param v_size : size of vertices
+ * @param indexes : list of indexes of each vertice in each triangle (3 vertices per triangle)
+ * @param size : number of triangles
  * @param id_program : id of the program to bind the pattern to
  * @param max_instance_nb : number max of instances of a pattern
  * @param number_of_attr : number of attributes to send to the shaders (expect from vertices)
  * @param ... : number_of_attr parameters where each one is the size of one attribute which will be located in locations from 1 to number_of_attr in the shader
  * @return the id of the pattern
  */
-unsigned addGLPattern(ListGLPattern lgp, float * vertices, unsigned size, GLuint id_program, unsigned long long max_instance_nb,unsigned number_of_attr,...);
+unsigned addGLPattern(ListGLPattern lgp, float * vertices,unsigned v_size,unsigned * indexes, unsigned size, GLuint id_program, unsigned long long max_instance_nb,unsigned number_of_attr,...);
+
+/* NOT FOR USER FUNCTIONS */
+void free_glpattern(void * glp);
 
 #endif

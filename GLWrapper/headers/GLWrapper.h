@@ -19,22 +19,14 @@
 
 /**
  * @brief Initialize GLWrapper
+ * @return 1 if it failed, 0 if not
  */
-void initGLWrapper(void);
+int initGLWrapper(void);
 
 /**
  * @brief Draw all instances of all patterns in a list of GLPattern
  * @param lgp : list of patterns to be displayed
  */
 void drawListGLPattern(ListGLPattern * lgp);
-
-/**
- * @brief Setter for the background color
- * @param r : new red value
- * @param g : new green value
- * @param b : new blue value
- * @param a : new alpha value
- */
-void setBackgroundColorGLWrapper(float r, float g, float b, float a);
 
 #endif

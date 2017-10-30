@@ -1,4 +1,4 @@
-#include "ErrorGlion.h"
+#include "ErrorGLWrapper.h"
 
 GLWRAPPER_ERROR _glwrapper_errors = NO_ERROR;
 
@@ -25,7 +25,7 @@ char * getErrMsgGLWrapper(GLWRAPPER_ERROR error){
     };
     static unsigned   sizes[]     = {42,44,44,43,34,32,49,46,52,53};
     unsigned          size        = 0;
-    char            * msg         = NULL;
+    char            * s           = NULL;
     unsigned          id          = 1;
     unsigned          i           = 0;
 

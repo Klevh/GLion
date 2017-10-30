@@ -1,10 +1,11 @@
 #include "GLWrapper.h"
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 
 #define WIDTH 400
 #define HEIGHT 400
 
-int errorManagment(void);
+int errorManagment(char * s);
 
 int main(){
     ProgramGLWrapperList   programs;
@@ -13,20 +14,26 @@ int main(){
     unsigned               pattern;
     float                  vertices[] =
 	{
-	    -1.f, 1.f, 0.f,
-	    +1.f, 1.f, 0.f,
-	    -1.f,-1.f, 0.f,
-
-	    -1.f,-1.f, 0.f,
-	    +1.f,-1.f, 0.f,
-	    +1.f, 1.f, 0.f
+	    -1.f, 1.f, 1.f,
+	    +1.f, 1.f, 1.f,
+	    -1.f,-1.f, 1.f,
+	    +1.f,-1.f, 1.f
 	};
+    unsigned               indexes[] = {0,1,2,2,3,1};
     GLInstance           * gli;
-    unsigned               i,j;
+    unsigned               i,j,k,l;
     int                    err;
+    GLPattern            * glp;
 
-    /* openGL and GLEW init */
-    initGL();
+    
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    #if defined(__APPLE__) || defined(__MACH__)
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
 
     /* --------- GLFW init ----------- */
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
@@ -41,9 +48,13 @@ int main(){
     glfwGetFramebufferSize(window,&w,&h);
     glViewport(0,0,w,h);
     /* ------------------------------- */
+    
+    /* openGL and GLEW init */
+    if(initGLWrapper())
+	return -1;
 
     /* background color */
-    setBackgroundColorGLWrapper(0,0,0,0);
+    glClearColor(0,0,0,0);
 
     /* creating the list of programs */
     programs = newProgramGLWrapperList();
@@ -53,7 +64,7 @@ int main(){
     }
 
     /* creating a program shader */
-    prog = newProgramGLWrapper(programs,"ressources/vertex.glsl","ressources/fragment.glsl",NULL);
+    prog = newProgramGLWrapper(programs,ofread_str("ressources/vertex.glsl"),ofread_str("ressources/fragment.glsl"),NULL);
     if(errorManagment("newProgramGLWrapper")){
 	closeProgramGLWrapper(programs);
 	glfwTerminate();
@@ -69,7 +80,7 @@ int main(){
     }
 
     /* adding a new pattern, let's say a square */
-    pattern = addGLPattern(lgp,vertices, sizeof(vertices)/sizeof(float), prog, 100,3,
+    pattern = addGLPattern(lgp,vertices,sizeof(vertices)/sizeof(float), indexes ,2, prog, 100,3,
 			   3, /* color RGB */
 			   2, /* offset XY */
 	                   2); /* ratio XY*/
@@ -83,17 +94,19 @@ int main(){
     /* adding all instances (10 * 10 squares) */
     i   = 0;
     err = 0;
-    while(!err && i < 10){
+    while(!err && i < 1){
 	j = 0;
-	while(!err && j < 10){
+	while(!err && j < 1){
 	    printf("Generating instance %d\n",i*10 + j + 1);
 	    gli = addGLInstance(lgp, pattern);
 	    err = errorManagment("addGLInstance");
 
 	    if(!err){
-		setDataGLInstance(gli, 0, 1, 0, 0);
-		setDataGLInstance(gli, 1, WIDTH/10*i, HEIGHT/10*j);
-		setDataGLInstance(gli, 2, WIDTH/11, HEIGHT/11);
+		for(j = 0; j < 6; ++j){
+		    setDataGLInstance(gli, 0, j, 1.f, 1.f, 1.f);
+		    setDataGLInstance(gli, 1, j, .1f, .1f);
+		    setDataGLInstance(gli, 2, j, .1f, .1f);
+		}
 	    }
 	    ++j;
 	}
@@ -104,6 +117,42 @@ int main(){
 	closeProgramGLWrapper(programs);
 	glfwTerminate();
 	return -1;
+    }
+
+    /* contenu du pattern */
+    j = 0;
+    while((glp = getList(lgp,j,NULL))){
+	printf("Pattern %u\n\tNumber of Instances : %llu\n\tIndexes : ",j + 1,glp->nb_instances);
+	for(i = 0; i < glp->size * 3; ++i)
+	    printf("%u ",glp->index[i]);
+	printf("\n\tVertices :\n\t");
+	for(i = 0; i < glp->v_size/3; ++i){
+	    putchar('\t');
+	    for(k = 0; k < 3; ++k)
+		printf("%lf ",glp->vertices[i*3 + k]);
+	    putchar('\n');
+	    putchar('\t');
+	}
+	printf("\n\tSize per info : ");
+	for(i = 0; i < glp->infos.sbi_size; ++i)
+	    printf("%u ",glp->infos.sizes_by_info[i]);
+	printf("\n\tStarting point of each info : ");
+	for(i = 0; i < glp->infos.sbi_size; ++i)
+	    printf("%u ",glp->infos.start_infos[i]);
+	putchar('\n');
+	for(i = 0; i < glp->nb_instances; ++i){
+	    printf("\tInstance %u",i + 1);
+	    for(k = 0; k < glp->size * 3; ++k){
+		putchar('\n');
+		putchar('\t');
+		putchar('\t');
+		for(l = 0; l < glp->infos.iv_size; ++l)
+		    printf("%f ",glp->infos.infos_values[i*glp->infos.iv_size*glp->size*3 + k*glp->infos.iv_size + l]);
+	    }
+	    putchar('\n');
+	}
+	putchar('\n');
+	++j;
     }
 
     /* main loop */
@@ -131,6 +180,7 @@ int errorManagment(char * s){
     char            * log;
     
     if((error = getErrGLWrapper())){
+	printf("log value : %d\n",error);
 	log = getErrMsgGLWrapper(error);
 	if(log){
 	    if(s)
@@ -141,5 +191,5 @@ int errorManagment(char * s){
 	    fprintf(stderr,"Failed to load error log message\n");
     }
 
-    return error != 0;
+    return error != NO_ERROR;
 }

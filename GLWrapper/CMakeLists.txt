@@ -22,6 +22,12 @@ add_library(
 # trouver les packages
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+
+IF(GLEW_FOUND)
+  MESSAGE(INFO " glew lib found at ${GLEW_LIBRARIES}")
+ELSE()
+  MESSAGE(ERROR " glew not found")
+ENDIF()
 find_package(glfw3 REQUIRED)
 # enlever la compilation des tests GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -42,7 +48,7 @@ target_link_libraries(
 
 target_include_directories(
   GLWrapper
-  PUBLIC GLWrapper/headers/
+  PUBLIC headers/
 )
 
 # definir l'exec
@@ -52,8 +58,23 @@ add_executable(
   tests/main.c
 )
 
+target_include_directories(
+  GLWrapper_sample
+  PUBLIC headers/
+  PUBLIC tests/
+)
+
 target_link_libraries(
   GLWrapper_sample
   GLWrapper
+  ${GLEW_LIBRARIES}
+  ${OPENGL_LIBRARIES}
+  glfw
 )
 
+# copie des fichiers dans le build
+
+file(GLOB SHADERS
+  "${PROJECT_SOURCE_DIR}/ressources/*")
+
+file(COPY ${SHADERS} DESTINATION ${CMAKE_BINARY_DIR}/ressources)
